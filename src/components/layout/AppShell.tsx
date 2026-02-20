@@ -15,7 +15,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { PanelLeft } from "lucide-react";
 
 // COMPONENTS
-import { Sidebar } from "@/components/sidebar/Sidebar";
+import Sidebar from "@/components/sidebar/Sidebar";
 import { PageView } from "@/components/editor/PageView";
 import { SearchPalette } from "@/components/ui/SearchPalette";
 import { SettingsPage } from "@/components/ui/SettingsPage";
