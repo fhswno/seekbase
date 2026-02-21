@@ -13,8 +13,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useWorkspaceStore } from "@/stores/workspace";
 
 // COMPONENTS
-import { WorkspaceIcon } from "@/components/ui/WorkspaceIcon";
-import { IconPicker } from "@/components/ui/IconPicker";
+import WorkspaceIcon from "@/components/ui/WorkspaceIcon";
+import IconPicker from "@/components/ui/IconPicker";
+
+// TYPES
 import { Workspace } from "@/types";
 
 const WorkspaceSwitcher = () => {
