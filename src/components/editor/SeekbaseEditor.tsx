@@ -16,7 +16,6 @@ import {
   FormattingToolbarController,
   FormattingToolbar,
   getFormattingToolbarItems,
-  useComponentsContext,
 } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
 import type { Theme } from "@blocknote/mantine";
@@ -30,9 +29,9 @@ import { Sparkles } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
 
 // COMPONENTS
-import { AITextToolbar } from "@/components/ai/AITextToolbar";
-import { AIInlinePrompt } from "@/components/ai/AIInlinePrompt";
-import { AutocompleteGhost } from "@/components/ai/AutocompleteGhost";
+import AITextToolbar from "@/components/ai/AITextToolbar";
+import AIInlinePrompt from "@/components/ai/AIInlinePrompt";
+import AutocompleteGhost from "../ai/AutocompleteGhost";
 
 // STORE
 import { useSettingsStore } from "@/stores/settings";
