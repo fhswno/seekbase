@@ -16,12 +16,12 @@ import { PanelLeft } from "lucide-react";
 
 // COMPONENTS
 import Sidebar from "@/components/sidebar/Sidebar";
-import { PageView } from "@/components/editor/PageView";
-import { SearchPalette } from "@/components/ui/SearchPalette";
-import { SettingsPage } from "@/components/ui/SettingsPage";
-import { TrashPanel } from "@/components/ui/TrashPanel";
-import { TemplatePicker } from "@/components/ui/TemplatePicker";
-import { Onboarding } from "@/components/ui/Onboarding";
+import PageView from "@/components/editor/PageView";
+import SearchPalette from "../ui/SearchPalette";
+import SettingsPage from "@/components/ui/SettingsPage";
+import TrashPanel from "@/components/ui/TrashPanel";
+import TemplatePicker from "@/components/ui/TemplatePicker";
+import Onboarding from "../ui/Onboarding";
 import AppLoading from "../loading/AppLoading";
 import AppEmpty from "../empty/AppEmpty";
 
