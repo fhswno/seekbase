@@ -57,19 +57,22 @@ const IconPicker = ({ currentIcon, onSelectIcon, onUploadImage }: Props) => {
     <div className="w-64">
       {/* Tabs */}
       <div className="flex border-b border-border">
-        {(["emoji", "icons", "upload"] as Tab[]).map((t) => (
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={`flex-1 px-2 py-1.5 text-xs font-medium capitalize transition-colors duration-[80ms] ${
-              tab === t
-                ? "border-b-2 border-accent text-text"
-                : "text-text-muted hover:text-text"
-            }`}
-          >
-            {t}
-          </button>
-        ))}
+        {(["emoji", "icons", "upload"] as Tab[]).map(
+          (t: Tab, index: number) => (
+            <button
+              key={index}
+              onClick={() => setTab(t)}
+              className={clsx(
+                "flex-1 px-2 py-1.5 text-xs font-medium capitalize transition-colors duration-[80ms]",
+                tab === t
+                  ? "border-b-2 border-accent text-text"
+                  : "text-text-muted hover:text-text",
+              )}
+            >
+              {t}
+            </button>
+          ),
+        )}
       </div>
 
       {/* CONTENT */}
@@ -131,6 +134,7 @@ const IconPicker = ({ currentIcon, onSelectIcon, onUploadImage }: Props) => {
           </div>
         )}
 
+        {/* UPLOAD TAB */}
         {tab === "upload" && (
           <div className="flex flex-col items-center gap-3 py-4">
             {currentIcon?.startsWith("image:") && (
