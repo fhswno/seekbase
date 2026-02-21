@@ -1,8 +1,5 @@
 "use client";
 
-// REACT
-import { useEffect, useState, useCallback } from "react";
-
 // STORE
 import { usePagesStore } from "@/stores/pages";
 
