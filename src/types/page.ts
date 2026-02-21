@@ -6,7 +6,7 @@ export type DatabaseViewType =
   | "list"
   | "timeline";
 
-export interface Page {
+export type Page = {
   id: string;
   workspaceId: string;
   parentId: string | null;
@@ -21,25 +21,25 @@ export interface Page {
   deletedAt: number | null;
   createdAt: number;
   updatedAt: number;
-}
+};
 
-export interface CreatePageParams {
+export type CreatePageParams = {
   workspaceId: string;
   parentId?: string | null;
   title: string;
   isDatabase: boolean;
   databaseType?: DatabaseViewType | null;
-}
+};
 
-export interface UpdatePageParams {
+export type UpdatePageParams = {
   title?: string;
   icon?: string | null;
   coverUrl?: string | null;
   isFavorite?: boolean;
   databaseType?: DatabaseViewType | null;
-}
+};
 
-export interface PageTreeNode {
+export type PageTreeNode = {
   page: Page;
   children: PageTreeNode[];
-}
+};
