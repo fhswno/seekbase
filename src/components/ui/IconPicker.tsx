@@ -26,6 +26,9 @@ type Props = {
 type Tab = "emoji" | "icons" | "upload";
 
 const IconPicker = ({ currentIcon, onSelectIcon, onUploadImage }: Props) => {
+  const tabs: Tab[] = onUploadImage
+    ? ["emoji", "icons", "upload"]
+    : ["emoji", "icons"];
   const [tab, setTab] = useState<Tab>("emoji");
   const [iconSearch, setIconSearch] = useState("");
 
@@ -57,7 +60,7 @@ const IconPicker = ({ currentIcon, onSelectIcon, onUploadImage }: Props) => {
     <div className="w-64">
       {/* Tabs */}
       <div className="flex border-b border-border">
-        {(["emoji", "icons", "upload"] as Tab[]).map(
+        {tabs.map(
           (t: Tab, index: number) => (
             <button
               key={index}
@@ -84,7 +87,7 @@ const IconPicker = ({ currentIcon, onSelectIcon, onUploadImage }: Props) => {
                 key={index}
                 onClick={() => onSelectIcon(emoji)}
                 className={clsx(
-                  "rounded-md p-1.5 text-lg transition-colors duration-[80ms]",
+                  "rounded-md w-7 text-lg transition-colors duration-[80ms]",
                   currentIcon === emoji
                     ? "bg-accent/20 ring-1 ring-accent"
                     : "hover:bg-surface-2",
