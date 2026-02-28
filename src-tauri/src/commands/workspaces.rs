@@ -117,3 +117,32 @@ pub async fn save_workspace_icon(
         .await
         .map_err(|e| e.to_string())
 }
+
+#[tauri::command]
+pub async fn delete_workspace(
+    state: State<'_, AppState>,
+    id: String,
+) -> Result<u64, String> {
+    // Delete all pages belonging to this workspace
+    // (blocks, properties, rows, cells, views cascade via FK constraints)
+    sqlx::query("DELETE FROM pages WHERE workspace_id = ?")
+        .bind(&id)
+        .execute(&state.db)
+        .await
+        .map_err(|e| e.to_string())?;
+
+    // Delete the workspace itself
+    sqlx::query("DELETE FROM workspaces WHERE id = ?")
+        .bind(&id)
+        .execute(&state.db)
+        .await
+        .map_err(|e| e.to_string())?;
+
+    // Return remaining workspace count
+    let count: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM workspaces")
+        .fetch_one(&state.db)
+        .await
+        .map_err(|e| e.to_string())?;
+
+    Ok(count.0 as u64)
+}
