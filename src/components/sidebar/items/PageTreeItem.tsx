@@ -180,7 +180,7 @@ const PageTreeItem = ({
     <div>
       <div
         className={clsx(
-          "group flex items-center rounded-md py-0.5 pr-1 transition-colors duration-[80ms]",
+          "group flex items-center rounded-md py-2 cursor-pointer pr-1 transition-colors duration-[80ms]",
           isActive
             ? "bg-surface-2 border-l-2 border-accent"
             : "hover:bg-surface-2 border-l-2 border-transparent",
@@ -194,9 +194,10 @@ const PageTreeItem = ({
         {/* EXPAND/COLLAPSE */}
         <button
           onClick={handleToggle}
-          className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-sm transition-colors duration-[80ms] hover:bg-border ${
-            !hasChildren ? "invisible" : ""
-          }`}
+          className={clsx(
+            "flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-sm transition-colors duration-[80ms] hover:bg-border",
+            !hasChildren && "hidden",
+          )}
         >
           <motion.div
             animate={{ rotate: expanded ? 90 : 0 }}
@@ -207,9 +208,11 @@ const PageTreeItem = ({
         </button>
 
         {/* PAGE ICON */}
-        <span className="mr-1.5 flex-shrink-0 text-sm">
-          {node.page.icon || (node.page.isDatabase ? "🗄️" : "")}
-        </span>
+        {node.page.icon && (
+          <span className="mr-1.5 pl-1 flex-shrink-0 text-sm">
+            {node.page.icon}
+          </span>
+        )}
 
         {/* TITLE/RENAME INPUT */}
         {isRenaming ? (
@@ -231,6 +234,7 @@ const PageTreeItem = ({
             className={clsx(
               "flex-1 truncate text-sm",
               isActive ? "text-text font-medium" : "text-text-muted",
+              !hasChildren && !node.page.icon && "pl-2",
             )}
           >
             {node.page.title || "Untitled"}
