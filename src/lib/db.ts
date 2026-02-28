@@ -58,6 +58,10 @@ export async function saveWorkspaceIcon(
   return invoke<Workspace>("save_workspace_icon", { workspaceId, sourcePath });
 }
 
+export async function deleteWorkspace(id: string): Promise<number> {
+  return invoke<number>("delete_workspace", { id });
+}
+
 // --- Pages ---
 
 export async function getPages(workspaceId: string): Promise<Page[]> {
