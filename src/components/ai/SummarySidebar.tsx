@@ -28,6 +28,11 @@ import {
   AlertCircle,
 } from "lucide-react";
 
+// CONSTANTS
+const SIDEBAR_MIN = 240;
+const SIDEBAR_MAX = 520;
+const SIDEBAR_DEFAULT = 300;
+
 // TYPESCRIPT
 type Props = {
   pageContent: string;
@@ -36,6 +41,8 @@ type Props = {
 
 const SummarySidebar = ({ pageContent, onClose }: Props) => {
   // States
+  const [width, setWidth] = useState<number>(SIDEBAR_DEFAULT);
+  const [isResizing, setIsResizing] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
   const {
     generating,
@@ -74,20 +81,59 @@ const SummarySidebar = ({ pageContent, onClose }: Props) => {
     setTimeout(() => setCopied(false), 2000);
   }, [result]);
 
+  // Handler - Resize
+  const handleResizeStart = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      setIsResizing(true);
+
+      const startX: number = e.clientX;
+      const startWidth: number = width;
+
+      function onMouseMove(e: MouseEvent) {
+        // Dragging left increases width (panel is on the right)
+        const delta: number = startX - e.clientX;
+        const newWidth: number = Math.min(
+          SIDEBAR_MAX,
+          Math.max(SIDEBAR_MIN, startWidth + delta),
+        );
+        setWidth(newWidth);
+      }
+
+      function onMouseUp() {
+        setIsResizing(false);
+        document.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("mouseup", onMouseUp);
+      }
+
+      document.addEventListener("mousemove", onMouseMove);
+      document.addEventListener("mouseup", onMouseUp);
+    },
+    [width],
+  );
+
   return (
     <motion.div
       initial={{ width: 0, opacity: 0 }}
-      animate={{ width: 280, opacity: 1 }}
+      animate={{ width, opacity: 1 }}
       exit={{ width: 0, opacity: 0 }}
-      transition={{ type: "spring", stiffness: 400, damping: 30 }}
-      className="h-full flex-shrink-0 overflow-hidden border-l border-border bg-surface"
+      transition={isResizing ? { duration: 0 } : { type: "spring", stiffness: 400, damping: 30 }}
+      className="relative h-full flex-shrink-0 overflow-hidden border-l border-border bg-surface"
     >
-      <div className="flex h-full w-[280px] flex-col">
+      {/* RESIZE HANDLE */}
+      <div
+        className="absolute left-0 top-0 z-10 h-full w-1 cursor-col-resize hover:bg-accent/30 active:bg-accent/50"
+        onMouseDown={handleResizeStart}
+        style={{
+          transition: isResizing ? "none" : "background-color 80ms",
+        }}
+      />
+
+      <div className="flex h-full flex-col" style={{ width }}>
         {/* HEADER */}
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
           <div className="flex items-center gap-2">
-            <Sparkles size={14} className="text-ai" />
-            <span className="text-sm font-semibold text-text">Summary</span>
+            <span className="text-sm font-semibold text-text">AI Summary</span>
           </div>
           <button
             onClick={onClose}
@@ -135,7 +181,7 @@ const SummarySidebar = ({ pageContent, onClose }: Props) => {
         </div>
 
         {/* FOOTER ACTIONS */}
-        <div className="flex items-center gap-1 border-t border-border px-3 py-2">
+        <div className="flex items-center justify-center gap-1 border-t border-border px-3 py-2">
           <button
             onClick={handleGenerate}
             disabled={generating}
