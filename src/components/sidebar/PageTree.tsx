@@ -48,7 +48,7 @@ const PageTree = () => {
   }
 
   return (
-    <div className="px-1">
+    <div className="px-3">
       {tree.map((node) => (
         <PageTreeItem key={node.page.id} node={node} depth={0} />
       ))}
