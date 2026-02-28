@@ -2,9 +2,17 @@
 
 // REACT
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 
 // LUCIDE
-import { Check, ChevronDown, Plus, Pencil, ArrowLeft } from "lucide-react";
+import {
+  Check,
+  ChevronDown,
+  Plus,
+  Pencil,
+  ArrowLeft,
+  Trash2,
+} from "lucide-react";
 
 // FRAMER MOTION
 import { motion, AnimatePresence } from "framer-motion";
@@ -15,20 +23,31 @@ import { useWorkspaceStore } from "@/stores/workspace";
 // COMPONENTS
 import WorkspaceIcon from "@/components/ui/WorkspaceIcon";
 import IconPicker from "@/components/ui/IconPicker";
+import DeleteWorkspaceModal from "@/components/ui/DeleteWorkspaceModal";
 
 // TYPES
 import { Workspace } from "@/types";
 
-const WorkspaceSwitcher = () => {
+type Props = {
+  onShowOnboarding: () => void;
+};
+
+const WorkspaceSwitcher = ({ onShowOnboarding }: Props) => {
   // States
   const [open, setOpen] = useState<boolean>(false);
   const [creating, setCreating] = useState<boolean>(false);
   const [newName, setNewName] = useState<string>("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState<string>("");
+  const [deletingWorkspace, setDeletingWorkspace] = useState<Workspace | null>(
+    null,
+  );
+  const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 0 });
 
   // Refs
+  const containerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const editNameRef = useRef<HTMLInputElement>(null);
 
@@ -38,6 +57,7 @@ const WorkspaceSwitcher = () => {
   const switchWorkspace = useWorkspaceStore((s) => s.switchWorkspace);
   const createWorkspace = useWorkspaceStore((s) => s.createWorkspace);
   const updateWorkspace = useWorkspaceStore((s) => s.updateWorkspace);
+  const deleteWorkspace = useWorkspaceStore((s) => s.deleteWorkspace);
   const updateWorkspaceIcon = useWorkspaceStore((s) => s.updateWorkspaceIcon);
   const saveWorkspaceIconFromFile = useWorkspaceStore(
     (s) => s.saveWorkspaceIconFromFile,
@@ -55,12 +75,14 @@ const WorkspaceSwitcher = () => {
   useEffect(() => {
     if (!open) return;
     function handleClick(e: MouseEvent) {
+      const target = e.target as Node;
       if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(e.target as Node)
+        containerRef.current?.contains(target) ||
+        dropdownRef.current?.contains(target)
       ) {
-        handleCloseDropdown();
+        return;
       }
+      handleCloseDropdown();
     }
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
@@ -145,6 +167,17 @@ const WorkspaceSwitcher = () => {
     [editingId, updateWorkspaceIcon],
   );
 
+  // Callback - Delete Workspace
+  const handleDeleteWorkspace = useCallback(async () => {
+    if (!deletingWorkspace) return;
+    const wasLast = await deleteWorkspace(deletingWorkspace.id);
+    setDeletingWorkspace(null);
+    setOpen(false);
+    if (wasLast) {
+      onShowOnboarding();
+    }
+  }, [deletingWorkspace, deleteWorkspace, onShowOnboarding]);
+
   // Callback - Save Edit Icon from File
   const handleUploadImage = useCallback(
     async (filePath: string) => {
@@ -155,10 +188,19 @@ const WorkspaceSwitcher = () => {
   );
 
   return (
-    <div ref={dropdownRef} className="relative">
+    <div ref={containerRef} className="relative">
       {/* TRIGGER */}
       <button
+        ref={triggerRef}
         onClick={() => {
+          if (!open && triggerRef.current) {
+            const rect = triggerRef.current.getBoundingClientRect();
+            setDropdownPos({
+              top: rect.bottom + 4,
+              left: rect.left,
+              width: rect.width,
+            });
+          }
           setOpen(!open);
           setEditingId(null);
           setCreating(false);
@@ -175,15 +217,12 @@ const WorkspaceSwitcher = () => {
         />
       </button>
 
-      {/* DROPDOWN */}
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: -4, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -4, scale: 0.95 }}
-            transition={{ duration: 0.15 }}
-            className="absolute left-0 right-0 top-full z-50 mt-1 overflow-hidden rounded-lg border border-border bg-surface shadow-xl"
+      {/* DROPDOWN — rendered via portal to escape overflow-hidden */}
+      {open && createPortal(
+          <div
+            ref={dropdownRef}
+            className="fixed z-50 overflow-hidden rounded-lg border border-border bg-surface shadow-xl animate-in fade-in zoom-in-95 duration-150"
+            style={{ top: dropdownPos.top, left: dropdownPos.left, minWidth: dropdownPos.width }}
           >
             {/* EDIT MODE */}
             {editingId && editingWorkspace && (
@@ -266,6 +305,18 @@ const WorkspaceSwitcher = () => {
                       >
                         <Pencil size={12} />
                       </button>
+                      <button
+                        onClick={(
+                          e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+                        ) => {
+                          e.stopPropagation();
+                          setDeletingWorkspace(ws);
+                        }}
+                        className="rounded-md p-1 text-text-faint opacity-0 transition-all duration-[80ms] hover:bg-red-500/10 hover:text-red-500 group-hover:opacity-100"
+                        title="Delete workspace"
+                      >
+                        <Trash2 size={12} />
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -311,9 +362,20 @@ const WorkspaceSwitcher = () => {
                 </div>
               </>
             )}
-          </motion.div>
+          </div>,
+          document.body,
         )}
-      </AnimatePresence>
+
+      {/* DELETE CONFIRMATION MODAL — portaled to escape sidebar transform */}
+      {deletingWorkspace && createPortal(
+        <DeleteWorkspaceModal
+          open={!!deletingWorkspace}
+          workspaceName={deletingWorkspace?.name ?? ""}
+          onConfirm={handleDeleteWorkspace}
+          onClose={() => setDeletingWorkspace(null)}
+        />,
+        document.body,
+      )}
     </div>
   );
 };
