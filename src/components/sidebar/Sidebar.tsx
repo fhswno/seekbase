@@ -35,6 +35,7 @@ type Props = {
   onOpenSettings: () => void;
   onOpenTemplatePicker: () => void;
   onCollapse: () => void;
+  onShowOnboarding: () => void;
 };
 
 const Sidebar = ({
@@ -44,6 +45,7 @@ const Sidebar = ({
   onOpenSettings,
   onOpenTemplatePicker,
   onCollapse,
+  onShowOnboarding,
 }: Props) => {
   // Stores
   const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId);
@@ -78,13 +80,13 @@ const Sidebar = ({
 
   return (
     <div className="flex h-full flex-col bg-surface" style={{ width }}>
-      {/* MACOS LIGHT SPACER */}
-      <div className="h-11 flex-shrink-0 drag-region" />
+      {/* DRAG REGION */}
+      <div data-tauri-drag-region className="h-11 flex-shrink-0" />
 
       {/* WORKSPACE SWITCHER + COLLAPSE */}
       <div className="flex items-center gap-1 px-3 pb-3">
         <div className="flex-1 min-w-0">
-          <WorkspaceSwitcher />
+          <WorkspaceSwitcher onShowOnboarding={onShowOnboarding} />
         </div>
         <button
           onClick={onCollapse}
