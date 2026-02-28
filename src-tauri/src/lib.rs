@@ -27,6 +27,7 @@ pub fn run() {
             commands::workspaces::create_workspace,
             commands::workspaces::update_workspace,
             commands::workspaces::save_workspace_icon,
+            commands::workspaces::delete_workspace,
             // Pages
             commands::pages::get_pages,
             commands::pages::get_page,
