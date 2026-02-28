@@ -218,6 +218,7 @@ const AppShell = () => {
               onOpenSettings={() => setShowSettings(true)}
               onOpenTemplatePicker={() => setShowTemplatePicker(true)}
               onCollapse={() => setSidebarCollapsed(true)}
+              onShowOnboarding={() => setShowOnboarding(true)}
             />
 
             {/* RESIZE */}
@@ -234,11 +235,17 @@ const AppShell = () => {
 
       {/* MAIN CONTENT */}
       <main className="relative flex-1 pt-11 print-main">
-        {/* SIDEBAR TOGGLE */}
+        {/* DRAG REGION */}
+        <div
+          data-tauri-drag-region
+          className="absolute inset-x-0 top-0 z-30 h-11 print-hide"
+        />
+
+        {/* SIDEBAR TOGGLE (when collapsed) */}
         {sidebarCollapsed && (
           <button
             onClick={() => setSidebarCollapsed(false)}
-            className="absolute left-3 top-12 z-20 rounded-md p-1.5 text-text-muted transition-colors duration-[80ms] hover:bg-surface-2 hover:text-text"
+            className="absolute left-3 top-8 z-40 rounded-md p-1.5 text-text-muted transition-colors duration-[80ms] hover:bg-surface-2 hover:text-text print-hide"
             title="Show sidebar (⌘[)"
           >
             <PanelLeft size={16} />
